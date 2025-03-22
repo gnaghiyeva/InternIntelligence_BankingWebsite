@@ -7,6 +7,7 @@ import org.example.bank.model.Transaction;
 import org.example.bank.payload.ApiResponse;
 import org.example.bank.repository.AccountRepository;
 import org.example.bank.repository.TransactionRepository;
+import org.example.bank.service.FraudDetectionService;
 import org.example.bank.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private FraudDetectionService fraudDetectionService;
     @Override
     public ApiResponse createTransaction(TransactionCreateDto transactionCreateDto) {
         Account sender = accountRepository.findByAccountNumber(transactionCreateDto.getSenderAccountNumber())
@@ -39,9 +42,6 @@ public class TransactionServiceImpl implements TransactionService {
             return new ApiResponse(false, "The amount to be sent cannot be greater than the receiver's balance");
         }
 
-        sender.setBalance(sender.getBalance().subtract(transactionCreateDto.getAmount()));
-        receiver.setBalance(receiver.getBalance().add(transactionCreateDto.getAmount()));
-
         Transaction transaction = new Transaction();
 
         transaction.setSenderAccountNumber(sender);
@@ -49,6 +49,13 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setAmount(transactionCreateDto.getAmount());
         transaction.setTransactionDate(LocalDateTime.now());
 
+        sender.setBalance(sender.getBalance().subtract(transactionCreateDto.getAmount()));
+        receiver.setBalance(receiver.getBalance().add(transactionCreateDto.getAmount()));
+
+        if (fraudDetectionService.isFraudulentTransaction(transaction)) {
+            return new ApiResponse(false, "Transaction flagged as fraudulent!");
+        }
+        
         transactionRepository.save(transaction);
         accountRepository.save(sender);
         accountRepository.save(receiver);
