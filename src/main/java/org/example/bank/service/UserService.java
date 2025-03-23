@@ -7,4 +7,5 @@ public interface UserService {
     String registerUser(RegisterDto registerDto);
     String loginUser(LoginDto loginDto);
     String getUserByUsername(String username);
+    String logoutUser();
 }

@@ -1,5 +1,6 @@
 package org.example.bank.service.impl;
 
+import jakarta.servlet.http.HttpSession;
 import org.example.bank.config.JwtUtil;
 import org.example.bank.dtos.user.LoginDto;
 import org.example.bank.dtos.user.RegisterDto;
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private HttpSession httpSession;
 
     @Override
     public String registerUser(RegisterDto registerDto) {
@@ -54,6 +58,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .map(User::getEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    @Override
+    public String logoutUser() {
+        httpSession.invalidate();  // ✅ Kullanıcının oturumunu sonlandır
+        return "User logged out successfully";
     }
 
 }
