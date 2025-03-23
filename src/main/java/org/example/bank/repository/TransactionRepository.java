@@ -19,6 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.senderAccountNumber.id = :senderId AND t.transactionDate >= :oneMinuteAgo")
     List<Transaction> findRecentTransactionsBySender(Long senderId, LocalDateTime oneMinuteAgo);
 
+    void deleteBySenderAccountNumberOrReceiverAccountNumber(Account sender, Account receiver);
 }
 
 

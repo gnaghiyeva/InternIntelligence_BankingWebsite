@@ -15,7 +15,8 @@ public class AccountDto {
     private String accountNumber;
     private BigDecimal balance;
     private Long userId;
-    private String userName;
+    public String firstName;
+    public String lastName;
 
 
 

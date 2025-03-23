@@ -18,10 +18,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Account senderAccountNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Account receiverAccountNumber;
 
     private BigDecimal amount;

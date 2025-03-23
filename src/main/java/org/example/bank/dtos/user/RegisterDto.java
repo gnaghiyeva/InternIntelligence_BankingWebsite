@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class RegisterDto {
-    private String username;
+    public String firstName;
+    public String lastName;
     private String email;
     private String password;
 }

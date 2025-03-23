@@ -1,5 +1,6 @@
 package org.example.bank.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.example.bank.dtos.account.AccountCreateDto;
 import org.example.bank.dtos.account.AccountDto;
 import org.example.bank.dtos.account.AccountUpdateDto;
@@ -7,6 +8,7 @@ import org.example.bank.model.Account;
 import org.example.bank.model.User;
 import org.example.bank.payload.ApiResponse;
 import org.example.bank.repository.AccountRepository;
+import org.example.bank.repository.TransactionRepository;
 import org.example.bank.repository.UserRepository;
 import org.example.bank.service.AccountService;
 import org.modelmapper.ModelMapper;
@@ -24,6 +26,8 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Override
     public ApiResponse createAccount(AccountCreateDto accountCreateDto) {
@@ -56,7 +60,8 @@ public class AccountServiceImpl implements AccountService {
                 account.getAccountNumber(),
                 account.getBalance(),
                 user.getId(),
-                user.getEmail()
+                user.getFirstName(),
+                user.getLastName()
         );
 
         return new ApiResponse(true, "Account retrieved", accountDto);
@@ -75,13 +80,18 @@ public class AccountServiceImpl implements AccountService {
         return new ApiResponse(true, "Account updated successfully");
     }
 
+    @Transactional
     @Override
     public ApiResponse deleteAccount(String accountNumber) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        transactionRepository.deleteBySenderAccountNumberOrReceiverAccountNumber(account, account);
         accountRepository.delete(account);
+
         return new ApiResponse(true, "Account deleted successfully");
     }
+
 
 
 }

@@ -35,7 +35,8 @@ public class UserServiceImpl implements UserService {
             return "Email already exists!";
         }
         User user = new User();
-        user.setUsername(registerDto.getUsername());
+        user.setFirstName(registerDto.getFirstName());
+        user.setLastName(registerDto.getLastName());
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         user.setRole(Role.USER);
